@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>길채정 압구정점 업무포털</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b1d12">
+<link rel="apple-touch-icon" href="images/icon-192.png">
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#f6f1ea;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
+  color:#24170f;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+.badge-link{
+  position:relative;
+}
+
+.badge-link{
+  position:relative;
+}
+
+.unpaid-badge{
+  display:none;
+  position:absolute;
+  top:-8px;
+  right:-8px;
+
+  min-width:24px;
+  height:24px;
+  padding:0 6px;
+
+  border-radius:999px;
+
+  background:#d93025;
+  color:#fff;
+
+  font-size:12px;
+  font-weight:700;
+
+  align-items:center;
+  justify-content:center;
+}
+
+.unpaid-badge{
+  display:none;
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  min-width:26px;
+  height:26px;
+  border-radius:999px;
+  background:#d93025;
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  align-items:center;
+  justify-content:center;
+}
+
+.page{
+  max-width:980px;
+  margin:0 auto;
+  padding:22px;
+}
+
+/* =========================
+   NAV
+========================= */
+
+.nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:900;
+}
+
+.nav-links{
+  display:flex;
+  gap:24px;
+  align-items:center;
+  font-size:15px;
+  font-weight:800;
+}
+
+.nav-btn{
+  background:#8a5a2b;
+  color:#fff;
+  padding:11px 20px;
+  border-radius:999px;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  height:430px;
+  border-radius:28px;
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(35,22,13,.72),
+      rgba(35,22,13,.38),
+      rgba(35,22,13,.12)
+    ),
+    url("images/hero-gilchaejeong.png")
+    center/cover no-repeat;
+
+  box-shadow:0 16px 38px rgba(52,32,16,.18);
+
+  display:flex;
+  align-items:center;
+}
+
+.hero-text{
+  padding-left:58px;
+  max-width:560px;
+  color:#fff;
+}
+
+
+.eyebrow{
+  color:#f3c27d;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.28em;
+  margin-bottom:15px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:48px;
+  line-height:1.12;
+  letter-spacing:-.07em;
+}
+
+.hero p{
+  margin:18px 0 0;
+  font-size:17px;
+  line-height:1.75;
+  font-weight:600;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid{
+  margin-top:34px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:#fffaf2;
+  border:1px solid #eadfce;
+  border-radius:24px;
+  padding:26px;
+  box-shadow:0 10px 28px rgba(52,32,16,.10);
+}
+
+.icon{
+  width:48px;
+  height:48px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:23px;
+  margin-bottom:18px;
+}
+
+.gold{background:#b88948}
+.blue{background:#0f6b8f}
+.green{background:#197857}
+.red{background:#c75252}
+.dark{background:#3f454b}
+
+.card h2{
+  margin:0 0 10px;
+  font-size:24px;
+  letter-spacing:-.05em;
+}
+
+.card p{
+  margin:0 0 22px;
+  color:#75685c;
+  font-size:14px;
+  line-height:1.7;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.btn{
+  display:block;
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  background:#8a5a2b;
+  color:#fff;
+  font-weight:900;
+  text-align:center;
+}
+
+.btn.sub{
+  margin-top:10px;
+  background:#f1e7d8;
+  color:#2b1b10;
+}
+
+/* =========================
+   NOTICE
+========================= */
+
+.notice{
+  margin-top:28px;
+  padding:18px 20px;
+  border-radius:16px;
+  background:#fff7e8;
+  border:1px solid #ead7b9;
+  color:#5c4025;
+  font-size:14px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  margin-top:34px;
+  padding-bottom:30px;
+  display:flex;
+  justify-content:space-between;
+  color:#75685c;
+  font-size:13px;
+  line-height:1.7;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:760px){
+
+  .page{
+    padding:14px;
+  }
+
+  .nav{
+    display:none;
+  }
+
+  .hero{
+    height:360px;
+
+    border-radius:24px;
+
+    background:
+      linear-gradient(
+        rgba(35,22,13,.58),
+        rgba(35,22,13,.58)
+      ),
+      url("images/hero-gilchaejeong.png")
+      center/cover no-repeat;
+  }
+
+  .hero-text{
+    padding:28px;
+  }
+
+  .hero h1{
+    font-size:34px;
+  }
+
+  .hero p{
+    font-size:15px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+
+  footer{
+    display:block;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <nav class="nav">
+
+    <div class="logo">
+      길채정
+    </div>
+
+    <div class="nav-links">
+      <a href="index.html">홈</a>
+      <a href="#work">업무포털</a>
+      <a href="store-manager.html">일일보고</a>
+
+      <a class="nav-btn" href="#work">
+        업무 바로가기
+      </a>
+    </div>
+
+  </nav>
+
+  <header class="hero">
+
+    <div class="hero-text">
+
+      <div class="eyebrow">
+        GILCHAEJEONG · APGUJEONG
+      </div>
+
+      
+      <h1>
+        정성을 담은<br>
+        길채정 압구정점 업무포털
+      </h1>
+
+      <p>
+        일일보고, 영업실적보고서, 출퇴근관리,
+        일용직 근무내역, 직원정보 입력,
+        연월차 신청을 한 곳에서 실행하는
+        압구정점 전용 인트라넷입니다.
+      </p>
+
+    </div>
+
+  </header>
+
+  <main id="work" class="grid">
+
+    <!-- 일일보고 -->
+
+    <article class="card">
+
+      <div class="icon gold">📋</div>
+
+      <h2>일일보고 · 매장점검</h2>
+
+      <p>
+        일일보고, 직원관리,
+        고객관리, 설비관리,
+        위생점검 및 컴플레인을 기록합니다.
+      </p>
+
+      <a class="btn"
+         href="store-manager.html"
+         target="_blank">
+
+         일일보고 입력
+
+      </a>
+
+      <a class="btn sub"
+         href="https://docs.google.com/spreadsheets/d/17y41ZvviLKDlKe4K0AzdbazpEMPMdLOhz4hcxQqJ4EI/edit?gid=1294398191#gid=1294398191"
+         target="_blank">
+
+         관리자 조회
+
+      </a>
+
+    </article>
+
+    <!-- 영업실적 -->
+
+    <article class="card">
+
+      <div class="icon blue">📊</div>
+
+      <h2>영업실적보고서</h2>
+
+      <p>
+        길채정 압구정점
+        영업실적보고서를 입력하고 관리합니다.
+      </p>
+
+      <a class="btn"
+         href="https://script.google.com/macros/s/AKfycbx-QNqhusp57z6cxhKLcTymf0z5gx7mHkt9kOrcLEGIfxN9b-kgNlk8qtZ_VLWv57dA/exec"
+         target="_blank">
+
+         영업실적 입력
+
+      </a>
+
+      <a class="btn sub"
+         href="https://docs.google.com/spreadsheets/d/1mmesI8_0POeqRJwcdyugLauWL0ZH4boPQn4w9YbRiT8/edit?gid=949326317#gid=949326317"
+         target="_blank">
+
+         관리자 조회
+
+      </a>
+
+    </article>
+
+    <!-- 출퇴근 -->
+
+    <article class="card">
+
+      <div class="icon green">⏱️</div>
+
+      <h2>출퇴근관리</h2>
+
+      <p>
+        직원 출근·퇴근 등록 및
+        관리자 근태 조회를 실행합니다.
+      </p>
+
+      <a class="btn"
+         href="https://thebigkorea.github.io/gilchaejeong-apgujeong/?v=10"
+         target="_blank">
+
+         출퇴근 등록
+
+      </a>
+
+      <a class="btn sub"
+   href="https://thebigkorea.github.io/gilchaejeong-apgujeong/admin.html"
+   target="_blank">
+
+   관리자 조회
+
+</a>
+
+    </article>
+
+    <!-- 일용직 -->
+
+    <article class="card">
+
+      <div class="icon red">👷</div>
+
+      <h2>일용직 근무내역</h2>
+
+      <p>
+        일용직 근무내역 입력 및
+        미지급 내역 확인을 실행합니다.
+      </p>
+
+      <a class="btn badge-link"
+   href="daily-worker.html"
+   target="_blank">
+
+  근무내역 입력
+
+  <span
+    id="dailyUnpaidBadge"
+    class="unpaid-badge">
+  </span>
+
+</a>
+
+      <a class="btn sub badge-link"
+   href="https://docs.google.com/spreadsheets/d/1UQ-ZTX7m5vncD3vAes77sLsB8kFPOnH759jt5EcZZuY/edit?gid=2024602370#gid=2024602370"
+   target="_blank">
+
+  관리자 조회
+
+  
+</a>
+
+    </article>
+
+    <!-- 직원정보 -->
+
+    <article class="card">
+
+      <div class="icon dark">👤</div>
+
+      <h2>직원정보 입력</h2>
+
+      <p>
+        직원정보를 입력하고
+        본사 통합 HR에 함께 저장합니다.
+      </p>
+
+      <a class="btn"
+         href="employee-info.html"
+         target="_blank">
+
+         직원정보 입력
+
+      </a>
+
+      <a class="btn sub"
+         href="https://docs.google.com/spreadsheets/d/1102TMFN5UtSoGKbz-3ijUK3Hl51jpzHKax3TgR7edU4/edit?gid=832174032#gid=832174032"
+         target="_blank">
+
+          관리자 조회
+
+      </a>
+
+    </article>
+
+    <!-- 연월차 -->
+
+    <article class="card">
+
+      <div class="icon green">🌿</div>
+
+      <h2>연월차 신청</h2>
+
+      <p>
+        직원 연월차 신청 및
+        관리자 승인 화면으로 이동합니다.
+      </p>
+
+      <a class="btn"
+         href="https://thebigkorea.github.io/gilchaejeong-apgujeong-leave/index.html?v=4"
+         target="_blank">
+
+         연월차 신청
+
+      </a>
+
+      <a class="btn sub"
+         href="https://docs.google.com/spreadsheets/d/1upE-5l2KEoUCJ1mY9NGdv5bnoGPQ-OXrxicNio0gNBs/edit?gid=227282284#gid=227282284"
+         target="_blank">
+
+         관리자 조회
+
+      </a>
+
+    </article>
+
+  </main>
+
+  <div class="notice">
+    ※ 이 페이지는 길채정 압구정점 내부 업무용 인트라넷입니다.
+  </div>
+
+  <footer>
+
+    <div>
+      <strong>길채정 압구정점 업무포털</strong><br>
+      내부 직원 업무용 인트라넷입니다.
+    </div>
+
+    <div>
+      © 길채정 압구정점
+    </div>
+
+  </footer>
+
+</div>
+
+<script>
+
+if("serviceWorker" in navigator){
+
+  window.addEventListener("load",function(){
+
+    navigator.serviceWorker.register("./service-worker.js");
+
+  });
+
+}
+
+</script>
+
+
+<script>
+const DAILY_WORKER_API_URL =
+  "https://script.google.com/macros/s/AKfycbzjJ4xzZl96Wi4AcYrfKrEzIl-gY5iEZCUEiZ_th51mD2Kq97G13z883QIMjFf99sQE3w/exec";
+
+async function loadDailyUnpaidBadge() {
+  const badges = document.querySelectorAll(".unpaid-badge");
+
+  if (!badges.length) return;
+
+  try {
+    const res = await fetch(
+      DAILY_WORKER_API_URL +
+      "?action=getDailyUnpaidCount&t=" +
+      Date.now(),
+      { cache: "no-store" }
+    );
+
+    const data = await res.json();
+    const count = Number(data.count || 0);
+
+    badges.forEach(function(badge) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.style.display = "flex";
+      } else {
+        badge.style.display = "none";
+      }
+    });
+
+  } catch (e) {
+    console.log("일용직 미지급 배지 조회 실패", e);
+  }
+}
+
+window.addEventListener("load", loadDailyUnpaidBadge);
+</script>
+
+</body>
+</html>
