@@ -493,14 +493,60 @@
 
   <section id="history" class="panel">
 
-    <h2>최근 등록내역</h2>
+  <div class="history-header">
 
-    <div id="recentList"
-         class="recent-list">
+    <div>
+      <h2>최근 등록내역</h2>
 
+      <p class="history-description">
+        본사 확인상태와 처리내용을 함께 확인할 수 있습니다.
+      </p>
     </div>
 
-  </section>
+    <button
+      type="button"
+      class="history-refresh-btn"
+      onclick="loadRecentLogs()">
+      ↻ 최근내역 새로고침
+    </button>
+
+  </div>
+
+  <div class="history-status-guide">
+
+    <span class="history-guide-item status-pending">
+      본사 미확인
+    </span>
+
+    <span class="history-guide-item status-check">
+      확인사항
+    </span>
+
+    <span class="history-guide-item status-supplement">
+      보완요청
+    </span>
+
+    <span class="history-guide-item status-action">
+      조치필요
+    </span>
+
+    <span class="history-guide-item status-complete">
+      처리완료
+    </span>
+
+  </div>
+
+  <div
+    id="recentList"
+    class="recent-list">
+
+    <div class="recent-loading">
+      최근내역을 불러오는 중입니다.
+    </div>
+
+  </div>
+
+</section>
 
 </main>
 

@@ -1,8 +1,6 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbxgmfJoOsG3d8uL7pnHB9GqJMf61jS-1la-aZeWX9aA5q7o5mhnce381-C3bvyqGqiZ/exec";
 
-const HQ_API_URL =
-  "https://script.google.com/macros/s/AKfycbzCO4TLMRGgt_OY-3T92mw58AAKcOwquq0ubepUEJgPO9YPeMV-hNeP7AHy7lvOPog7oQ/exec";
 
 const STORE_NAME = "길채정 압구정점";
 const BRAND_NAME = "길채정";
@@ -137,71 +135,37 @@ function setDefaultDates() {
 ========================= */
 
 async function saveLog(payload) {
+  try {
 
-  const data =
-    await api({
+    const data = await api({
       action: "saveStoreDailyLog",
       ...payload
     });
 
-  try {
-
-    if (
-      HQ_API_URL &&
-      !HQ_API_URL.includes("입력")
-    ) {
-
-      await fetch(HQ_API_URL, {
-        method: "POST",
-
-        body: JSON.stringify({
-
-          storeName: STORE_NAME,
-          brand: BRAND_NAME,
-
-          writer:
-            payload.writer || "",
-
-          category:
-            payload.type ||
-            payload.category ||
-            "",
-
-          priority:
-            payload.urgency || "일반",
-
-          content:
-            "[점포] " + STORE_NAME + "\n" +
-            "[구분] " + (payload.category || "") + "\n" +
-            "[제목] " + (payload.title || "") + "\n" +
-            "[내용] " + (payload.content || "") + "\n" +
-            "[요청/전달] " + (payload.request || "") + "\n" +
-            "[추가사항] " + (payload.extra || ""),
-
-          photo: ""
-
-        })
-
-      });
-
+    if (data.success === false) {
+      throw new Error(
+        data.message ||
+        "저장에 실패했습니다."
+      );
     }
+
+    alert(
+      data.message ||
+      "저장되었습니다."
+    );
+
+    await loadDashboard();
+    await loadRecentLogs();
 
   } catch (e) {
 
-    console.log(
-      "본사 통합원장 저장 실패",
-      e
+    console.error(e);
+
+    alert(
+      "저장 중 오류가 발생했습니다.\n" +
+      e.message
     );
-
   }
-
-  alert(
-    data.message || "저장되었습니다."
-  );
-
-  loadDashboard();
-  loadRecentLogs();
-
 }
 
 /* =========================
@@ -487,91 +451,402 @@ async function loadDashboard() {
 ========================= */
 
 async function loadRecentLogs() {
+  const box =
+    document.getElementById(
+      "recentList"
+    );
+
+  if (!box) {
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="recent-loading">
+      최근내역을 불러오는 중입니다.
+    </div>
+  `;
 
   try {
 
-    const data =
-      await api({
-        action:
-          "getStoreManagerLogs",
-        store:
-          STORE_NAME
-      });
+    const data = await api({
+      action: "getStoreManagerLogs",
+      store: STORE_NAME,
+      t: Date.now()
+    });
+
+    if (data.success === false) {
+      throw new Error(
+        data.message ||
+        "최근내역 조회에 실패했습니다."
+      );
+    }
 
     const logs =
-      data.logs || [];
-
-    const box =
-      document.getElementById(
-        "recentList"
-      );
+      Array.isArray(data.logs)
+        ? data.logs
+        : [];
 
     if (logs.length === 0) {
 
-      box.innerHTML =
-        "<div class='log-card'>등록된 내역이 없습니다.</div>";
+      box.innerHTML = `
+        <div class="recent-loading">
+          등록된 내역이 없습니다.
+        </div>
+      `;
 
       return;
-
     }
 
     box.innerHTML =
-      logs.map(log => {
+      logs.map(function(log) {
 
-        const badgeClass =
-          log.urgency === "긴급"
+        const urgency =
+          String(
+            log.urgency ||
+            "일반"
+          ).trim();
+
+        const urgencyClass =
+          urgency === "긴급"
             ? "urgent"
-            : log.urgency === "중요"
-            ? "important"
-            : "normal";
+            : urgency === "중요"
+              ? "important"
+              : "normal";
+
+        const status =
+          normalizeStoreStatus(
+            log.status,
+            log.hqCheck ||
+            log.hqChecked
+          );
+
+        const statusClass =
+          getStoreStatusClass(
+            status
+          );
+
+        const feedback =
+          String(
+            log.feedback ||
+            ""
+          ).trim() ||
+          extractHeadOfficeFeedback(
+            log.extra
+          );
+
+        const checkedAt =
+          log.checkedAt || "";
 
         return `
+          <article
+            class="recent-item ${
+              urgency === "긴급"
+                ? "urgent"
+                : ""
+            }">
 
-        <div class="log-card">
+            <div class="recent-item-header">
 
-          <div class="log-title">
+              <div>
 
-            ${log.date || ""}
-            /
-            ${log.store || ""}
-            /
-            ${log.type || ""}
+                <div class="recent-item-title">
+                  ${escapeHtml(
+                    log.title ||
+                    log.category ||
+                    log.type ||
+                    "매장 운영기록"
+                  )}
+                </div>
 
-          </div>
+                <div class="recent-item-meta">
 
-          <div class="log-meta">
+                  ${escapeHtml(
+                    log.date ||
+                    log.createdAt ||
+                    ""
+                  )}
 
-            구분 :
-            ${log.category || "-"} <br>
+                  ${
+                    log.store
+                      ? " · " +
+                        escapeHtml(log.store)
+                      : ""
+                  }
 
-            제목 :
-            ${log.title || "-"} <br>
+                  ${
+                    log.type
+                      ? " · " +
+                        escapeHtml(log.type)
+                      : ""
+                  }
 
-            작성/대상 :
-            ${log.writer || "-"} <br>
+                  ${
+                    log.writer
+                      ? " · 작성자 " +
+                        escapeHtml(log.writer)
+                      : ""
+                  }
 
-            내용 :
-            ${log.content || "-"} <br>
+                </div>
 
-            상태 :
-            ${log.status || "-"}
+              </div>
 
-          </div>
+              <span
+                class="recent-status-badge ${statusClass}">
 
-          <span class="badge ${badgeClass}">
-            ${log.urgency || "일반"}
-          </span>
+                ${escapeHtml(
+                  getStoreStatusLabel(status)
+                )}
 
-        </div>
+              </span>
 
+            </div>
+
+            <div class="recent-content">
+
+              <strong>구분</strong>
+              ${escapeHtml(
+                log.category || "-"
+              )}
+
+              <br>
+
+              <strong>내용</strong>
+              ${escapeHtml(
+                log.content || "-"
+              )}
+
+              ${
+                log.request
+                  ? `
+                    <br>
+                    <strong>요청사항</strong>
+                    ${escapeHtml(log.request)}
+                  `
+                  : ""
+              }
+
+            </div>
+
+            <div style="margin-top:12px;">
+
+              <span class="badge ${urgencyClass}">
+                ${escapeHtml(urgency)}
+              </span>
+
+            </div>
+
+            ${
+              feedback
+                ? `
+                  <div class="head-office-feedback">
+
+                    <div class="head-office-feedback-title">
+                      본사 처리내용
+                    </div>
+
+                    <div class="head-office-feedback-content">
+                      ${escapeHtml(feedback)}
+                    </div>
+
+                    ${
+                      checkedAt
+                        ? `
+                          <div class="head-office-checked-at">
+                            본사 확인일시:
+                            ${escapeHtml(checkedAt)}
+                          </div>
+                        `
+                        : ""
+                    }
+
+                  </div>
+                `
+                : status !== "미확인"
+                  ? `
+                    <div class="head-office-feedback">
+
+                      <div class="head-office-feedback-title">
+                        본사 처리상태
+                      </div>
+
+                      <div class="head-office-feedback-content">
+                        ${escapeHtml(
+                          getStoreStatusLabel(status)
+                        )}
+                      </div>
+
+                      ${
+                        checkedAt
+                          ? `
+                            <div class="head-office-checked-at">
+                              본사 확인일시:
+                              ${escapeHtml(checkedAt)}
+                            </div>
+                          `
+                          : ""
+                      }
+
+                    </div>
+                  `
+                  : ""
+            }
+
+          </article>
         `;
 
       }).join("");
 
   } catch (e) {
 
-    console.log(e);
+    console.error(e);
 
+    box.innerHTML = `
+      <div class="recent-loading">
+        최근내역을 불러오지 못했습니다.<br>
+        ${escapeHtml(e.message)}
+      </div>
+    `;
+  }
+}
+function normalizeStoreStatus(
+  status,
+  hqCheck
+) {
+  const statusText =
+    String(status || "").trim();
+
+  const checkText =
+    String(hqCheck || "").trim();
+
+  if (statusText === "조치완료") {
+    return "조치완료";
   }
 
+  if (statusText === "확인완료") {
+    return "확인완료";
+  }
+
+  if (statusText === "조치필요") {
+    return "조치필요";
+  }
+
+  if (
+    statusText === "보완요청" ||
+    statusText === "보완사항"
+  ) {
+    return "보완요청";
+  }
+
+  if (statusText === "확인사항") {
+    return "확인사항";
+  }
+
+  if (
+    checkText === "Y" ||
+    checkText === "확인완료"
+  ) {
+    return "확인완료";
+  }
+
+  if (
+    statusText === "" ||
+    statusText === "미확인" ||
+    statusText === "본사미확인"
+  ) {
+    return "미확인";
+  }
+
+  return statusText;
+}
+
+
+function getStoreStatusLabel(status) {
+  const text =
+    String(status || "").trim();
+
+  if (text === "미확인") {
+    return "본사 미확인";
+  }
+
+  if (text === "확인사항") {
+    return "본사 확인사항";
+  }
+
+  if (text === "보완요청") {
+    return "본사 보완요청";
+  }
+
+  if (text === "조치필요") {
+    return "조치필요";
+  }
+
+  if (text === "확인완료") {
+    return "확인완료";
+  }
+
+  if (text === "조치완료") {
+    return "조치완료";
+  }
+
+  return text || "본사 미확인";
+}
+
+
+function getStoreStatusClass(status) {
+  const text =
+    String(status || "").trim();
+
+  if (text === "확인사항") {
+    return "status-check";
+  }
+
+  if (text === "보완요청") {
+    return "status-supplement";
+  }
+
+  if (text === "조치필요") {
+    return "status-action";
+  }
+
+  if (
+    text === "확인완료" ||
+    text === "조치완료"
+  ) {
+    return "status-complete";
+  }
+
+  return "status-pending";
+}
+
+
+function extractHeadOfficeFeedback(value) {
+  const text =
+    String(value || "");
+
+  const marker =
+    "[본사피드백]";
+
+  const index =
+    text.lastIndexOf(marker);
+
+  if (index < 0) {
+    return "";
+  }
+
+  return text
+    .substring(
+      index + marker.length
+    )
+    .trim();
+}
+
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
